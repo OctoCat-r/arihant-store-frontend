@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+/* Dark mode via data-theme attribute */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── Design tokens ── */
+:root {
+  --accent: #f5efe7;
+  --accent-2: #c4975a;
+  --accent-soft: #f5efe7;
+  --input-focus-border: #c8b49a;
+  --input-focus-ring: rgba(154, 136, 112, 0.18);
+}
+[data-theme="dark"] {
+  --accent: #c8ae8e;
+  --accent-soft: #2c2118;
+  --input-focus-border: #c8ae8e;
+  --input-focus-ring: rgba(200, 174, 142, 0.2);
+}
+
+/* ── Typography ── */
+body {
+  font-family:
+    "DM Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+@layer base {
+  h1,
+  h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+  }
+}
+
+/* ── Atmosphere: warm background + grain ── */
+body {
+  background-color: #f6f1eb;
+  background-image:
+    radial-gradient(
+      ellipse at 12% 0%,
+      rgba(196, 151, 90, 0.09) 0%,
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse at 88% 100%,
+      rgba(154, 136, 112, 0.07) 0%,
+      transparent 48%
+    );
+}
+
+[data-theme="dark"] body {
+  background-color: #100f0d;
+  background-image:
+    radial-gradient(
+      ellipse at 10% 0%,
+      rgba(154, 136, 112, 0.07) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 90% 100%,
+      rgba(100, 80, 55, 0.06) 0%,
+      transparent 50%
+    );
+}
+
+/* Grain overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* ── Base form element styles ── */
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    @apply w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition-colors dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px var(--input-focus-ring);
+  }
+}
+
+/* ── Motion ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-slide-up {
+  animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.animate-fade-in {
+  animation: fade-in 0.2s;
+}
+
+/* Stagger delays */
+.delay-1 {
+  animation-delay: 60ms;
+}
+.delay-2 {
+  animation-delay: 130ms;
+}
+.delay-3 {
+  animation-delay: 210ms;
+}
+.delay-4 {
+  animation-delay: 300ms;
+}
+.delay-5 {
+  animation-delay: 390ms;
+}
+
+/* ── Multi-line clamp ── */
+.clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Scrollbars ── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d4c5b0;
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── Sparkline ── */
+.sparkline {
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+
+/* ── Drag-over ── */
+.drag-over {
+  border-color: var(--accent) !important;
+  background-color: var(--accent-soft) !important;
+}
