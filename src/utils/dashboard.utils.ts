@@ -1,26 +1,9 @@
 import type { Category } from '@/types'
 import type { DashboardData } from '@/hooks/queries/useGetDashboardQuery'
-import type { RevenueByCategoryEntry } from '@/components/charts/RevenueByCategoryChart'
 import type { TopSellerEntry } from '@/components/charts/TopSellersChart'
 import type { CategoryProfitabilityEntry } from '@/components/charts/CategoryProfitabilityChart'
 
 const FALLBACK_COLOR = '#888'
-
-export function buildRevenueByCategoryData(
-  dashboardData: DashboardData | undefined,
-  categories: Category[],
-): RevenueByCategoryEntry[] {
-  return (dashboardData?.byCategory ?? [])
-    .map(categoryRevenue => {
-      const matchedCategory = categories.find(c => c.id === categoryRevenue.category)
-      return {
-        name: matchedCategory?.name ?? categoryRevenue.category,
-        fill: matchedCategory?.color ?? FALLBACK_COLOR,
-        value: categoryRevenue.revenue,
-      }
-    })
-    .filter(entry => entry.value > 0)
-}
 
 export function buildCategoryProfitabilityData(
   dashboardData: DashboardData | undefined,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppStore, useAuthStore } from "@/store";
-import { useGetProductsQuery } from "@/hooks";
+import { useGetAllProductsQuery } from "@/hooks";
 import { Sidebar, AppHeader } from "@/components";
 import {
   Login,
@@ -24,7 +24,7 @@ function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
-  const { data: productsResult } = useGetProductsQuery();
+  const { data: productsResult } = useGetAllProductsQuery();
   const products = productsResult?.data ?? [];
   const lowStockCount = products.filter(
     (p) => p.stock === 0 || p.stock <= p.lowStockThreshold,

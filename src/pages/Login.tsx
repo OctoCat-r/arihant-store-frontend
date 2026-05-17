@@ -68,7 +68,7 @@ export function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 flex w-full items-center justify-center rounded-lg bg-[var(--accent)] py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60 transition-opacity">
+              className="mt-1 flex w-full items-center justify-center rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300">
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>

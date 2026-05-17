@@ -1,4 +1,5 @@
 export * from './useGetProductsQuery'
+export * from './useGetAllProductsQuery'
 export * from './useGetCategoriesQuery'
 export * from './useGetBrandsQuery'
 export * from './useGetSalesQuery'

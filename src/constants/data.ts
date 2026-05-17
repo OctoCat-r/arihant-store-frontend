@@ -99,7 +99,6 @@ export const SEED_SALES: Sale[] = (() => {
         cost: product.cost * qty,
         profit: (product.price - product.cost) * qty,
         customer: customers[Math.floor(Math.random() * customers.length)],
-        paymentMethod: methods[Math.floor(Math.random() * methods.length)],
       })
     }
   }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { formatINR, formatINRFull } from '@/lib/formatters'
-import { KpiCard, Badge, Icon, AppSelect } from '@/components'
+import { KpiCard, Icon, AppSelect } from '@/components'
 import { RecordSaleModal } from '@/components/sales/RecordSaleModal'
 import { useSalesFilterStore } from '@/store'
 import { useGetSalesQuery, useGetCategoriesQuery } from '@/hooks'
@@ -12,19 +12,11 @@ const RANGE_OPTIONS: SelectOption[] = [
   { value: '30', label: 'Last 30 days' },
 ]
 
-const PM_OPTIONS: SelectOption[] = [
-  { value: 'all', label: 'All payments' },
-  { value: 'UPI', label: 'UPI' },
-  { value: 'Cash', label: 'Cash' },
-  { value: 'Card', label: 'Card' },
-]
-
 export function SalesLog() {
   const [modalOpen, setModalOpen] = useState(false)
   const { filters, updateFilters } = useSalesFilterStore()
   const range = filters.range ?? '30'
   const catFilter = filters.catFilter ?? 'all'
-  const pmFilter = filters.pmFilter ?? 'all'
 
   const { data, isLoading } = useGetSalesQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
@@ -71,13 +63,6 @@ export function SalesLog() {
             onChange={opt => updateFilters({ catFilter: (opt as SelectOption | null)?.value ?? 'all' })}
             isSearchable={false}
           />
-          <AppSelect
-            className="w-36"
-            options={PM_OPTIONS}
-            value={PM_OPTIONS.find(o => o.value === pmFilter) ?? null}
-            onChange={opt => updateFilters({ pmFilter: (opt as SelectOption | null)?.value ?? 'all' })}
-            isSearchable={false}
-          />
         </div>
 
         {/* KPIs */}
@@ -94,25 +79,20 @@ export function SalesLog() {
             <span className="text-xs text-zinc-400">most recent first</span>
           </div>
           <div className="overflow-x-auto">
-            <div className="grid min-w-[640px] grid-cols-7 gap-2 border-b border-stone-100 px-5 py-2.5 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+            <div className="grid min-w-160 grid-cols-6 gap-2 border-b border-stone-100 px-5 py-2.5 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
               <span>Date</span><span>Product</span><span>Qty</span>
-              <span>Customer</span><span>Pmt</span><span>Profit</span><span>Total</span>
+              <span>Customer</span><span>Profit</span><span>Total</span>
             </div>
             {isLoading ? (
               <div className="py-12 text-center text-sm text-zinc-400">Loading…</div>
             ) : sales.length === 0 ? (
               <div className="py-12 text-center text-sm text-zinc-400">No sales yet</div>
             ) : sales.map(s => (
-              <div key={s.id} className="grid min-w-[640px] grid-cols-7 gap-2 border-b border-stone-50 px-5 py-3 text-sm last:border-0 hover:bg-stone-50 dark:border-zinc-800/50 dark:hover:bg-zinc-800/30 transition-colors">
+              <div key={s.id} className="grid min-w-160 grid-cols-6 gap-2 border-b border-stone-50 px-5 py-3 text-sm last:border-0 hover:bg-stone-50 dark:border-zinc-800/50 dark:hover:bg-zinc-800/30 transition-colors">
                 <span className="text-zinc-400">{s.date.slice(5)}</span>
                 <span className="truncate font-medium text-zinc-900 dark:text-zinc-100">{s.productName}</span>
                 <span className="text-zinc-600 dark:text-zinc-400">×{s.qty}</span>
                 <span className="truncate text-zinc-500">{s.customer}</span>
-                <span>
-                  <Badge color={s.paymentMethod === 'UPI' ? 'purple' : s.paymentMethod === 'Cash' ? 'green' : 'blue'}>
-                    {s.paymentMethod}
-                  </Badge>
-                </span>
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">+{formatINR(s.profit)}</span>
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">{formatINRFull(s.revenue)}</span>
               </div>

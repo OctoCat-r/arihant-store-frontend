@@ -9,7 +9,7 @@ import {
   productFormSchema,
   type ProductFormValues,
 } from "./ProductForm.schema";
-import { COLORS_AVAILABLE, COMPATIBLE_MODELS } from "@/constants/colors";
+import { COMPATIBLE_MODELS } from "@/constants/colors";
 import { formatINRFull } from "@/lib/formatters";
 import { genId, today } from "@/lib/utils";
 import {
@@ -17,7 +17,7 @@ import {
   useUpdateProductMutation,
   useDeleteProductMutation,
   useAddBrandMutation,
-  useGetProductsQuery,
+  useGetAllProductsQuery,
   useGetCategoriesQuery,
   useGetBrandsQuery,
 } from "@/hooks";
@@ -48,7 +48,7 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
 
   const { data: categories = [] } = useGetCategoriesQuery();
   const { data: brands = [] } = useGetBrandsQuery();
-  const { data: productsResult } = useGetProductsQuery();
+  const { data: productsResult } = useGetAllProductsQuery();
   const product = id
     ? (productsResult?.data ?? []).find((p) => p.id === id)
     : undefined;
@@ -76,12 +76,8 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
 
   const formValues = watch();
   const cost = formValues.cost ?? 0;
-  const price = formValues.price ?? 0;
   const stock = formValues.stock ?? 0;
   const alertAt = formValues.lowStockThreshold ?? 5;
-  const profitMargin = price - cost;
-  const profitMarginPercent = cost > 0 ? (profitMargin / price) * 100 : 0;
-  const isProfit = profitMargin > 0;
 
   const stockPct = alertAt > 0 ? Math.min((stock / (alertAt * 6)) * 100, 100) : 0;
   const stockStatus =
@@ -102,6 +98,9 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
       rating: product?.rating ?? 4,
       addedDate: product?.addedDate ?? today(),
       image: null,
+      price: product?.price ?? 0,
+      color: product?.color ?? null,
+      sku: product?.sku ?? "",
       ...formData,
     };
     await (isNew ? createProduct(productPayload) : updateProduct(productPayload));
@@ -177,7 +176,7 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
               {/* 01 — Identity */}
               <div className="p-6">
                 <SectionMark n="01" label="Identity" />
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Field label="Product name" error={errors.name?.message}>
                     <input {...register("name")} placeholder="e.g. Silicone Back Cover" />
                   </Field>
@@ -188,69 +187,6 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
                       placeholder="0"
                     />
                   </Field>
-                  <Field label="Selling price (₹)" error={errors.price?.message}>
-                    <input
-                      type="number"
-                      {...register("price", { valueAsNumber: true })}
-                      placeholder="0"
-                    />
-                  </Field>
-                </div>
-
-                {/* Margin callout */}
-                <div
-                  className={cn(
-                    "mt-4 flex items-center gap-4 overflow-hidden rounded-xl px-5 py-3.5 transition-colors",
-                    isProfit
-                      ? "bg-emerald-50 dark:bg-emerald-950/20"
-                      : "bg-stone-100 dark:bg-zinc-800/60",
-                  )}
-                >
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 dark:text-zinc-500">
-                      Margin per unit
-                    </p>
-                    <p
-                      className={cn(
-                        "mt-0.5 font-[Fraunces,Georgia,serif] text-2xl font-semibold leading-none",
-                        isProfit
-                          ? "text-emerald-700 dark:text-emerald-400"
-                          : "text-stone-400 dark:text-zinc-500",
-                      )}
-                      style={{ fontOpticalSizing: "auto" } as React.CSSProperties}
-                    >
-                      {formatINRFull(profitMargin)}
-                    </p>
-                  </div>
-                  {cost > 0 && price > 0 && (
-                    <>
-                      <div className="h-8 w-px bg-stone-200 dark:bg-zinc-700" />
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 dark:text-zinc-500">
-                          Margin %
-                        </p>
-                        <p
-                          className={cn(
-                            "mt-0.5 text-xl font-bold leading-none",
-                            isProfit
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-red-500",
-                          )}
-                        >
-                          {profitMarginPercent.toFixed(1)}
-                          <span className="text-sm font-normal opacity-70">%</span>
-                        </p>
-                      </div>
-                      <div className="ml-auto text-right">
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 dark:text-zinc-500">
-                          Sell at
-                        </p>
-                        <p className="mt-0.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                          {formatINRFull(price)}
-                        </p>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
 
@@ -259,7 +195,7 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
               {/* 02 — Classification */}
               <div className="p-6">
                 <SectionMark n="02" label="Classification" />
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Field label="Brand" error={errors.brand?.message}>
                     <Controller
                       name="brand"
@@ -293,23 +229,6 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
                       )}
                     />
                   </Field>
-                  <Field label="Color">
-                    <Controller
-                      name="color"
-                      control={control}
-                      render={({ field }) => (
-                        <AppSelect
-                          options={[
-                            { value: "", label: "— None —" },
-                            ...COLORS_AVAILABLE.map((c) => ({ value: c, label: c })),
-                          ]}
-                          value={{ value: field.value ?? "", label: field.value || "— None —" }}
-                          onChange={(opt) => field.onChange(opt?.value ?? null)}
-                          isSearchable={false}
-                        />
-                      )}
-                    />
-                  </Field>
                 </div>
               </div>
 
@@ -318,10 +237,7 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
               {/* 03 — Inventory */}
               <div className="p-6">
                 <SectionMark n="03" label="Inventory" />
-                <div className="grid grid-cols-3 gap-4">
-                  <Field label="SKU" error={errors.sku?.message}>
-                    <input {...register("sku")} placeholder="ARI-XXX" />
-                  </Field>
+                <div className="grid grid-cols-2 gap-4">
                   <Field label="Current stock" error={errors.stock?.message}>
                     <input
                       type="number"
@@ -398,7 +314,6 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
 
               {/* Preview card */}
               <div className="animate-fade-up delay-2 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                {/* Tinted header */}
                 <div
                   className="flex h-28 items-center justify-center transition-colors"
                   style={{
@@ -414,7 +329,6 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
                   />
                 </div>
 
-                {/* Product info */}
                 <div className="p-4 text-center">
                   <p className="truncate font-semibold text-zinc-900 dark:text-zinc-100">
                     {formValues.name || <span className="text-stone-300 dark:text-zinc-600">Product name</span>}
@@ -429,22 +343,13 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
                     )}
                   </p>
                   <div className="mt-3 border-t border-stone-100 pt-3 dark:border-zinc-800">
-                    <p
-                      className="font-[Fraunces,Georgia,serif] text-2xl font-semibold text-zinc-900 dark:text-zinc-100"
-                      style={{ fontOpticalSizing: "auto" } as React.CSSProperties}
-                    >
-                      {formatINRFull(price)}
-                    </p>
-                    <p className="mt-0.5 text-xs text-stone-400">
-                      cost {formatINRFull(cost)}
-                    </p>
+                    <p className="text-xs text-stone-400">cost {formatINRFull(cost)}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Stock & margin stats */}
+              {/* Stock stats */}
               <div className="animate-fade-up delay-3 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                {/* Stock level bar */}
                 <div className="px-4 pt-4 pb-3">
                   <div className="mb-1.5 flex items-center justify-between">
                     <span className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 dark:text-zinc-500">
@@ -467,25 +372,15 @@ export function ProductForm({ isNew = false }: ProductFormProps) {
 
                 <div className="border-t border-stone-100 dark:border-zinc-800" />
 
-                {/* Stat rows */}
                 {[
-                  { label: "Selling price", value: formatINRFull(price) },
                   { label: "Cost price", value: formatINRFull(cost) },
-                  {
-                    label: "Margin",
-                    value: `${profitMarginPercent.toFixed(1)}%`,
-                    valueClass: isProfit
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-red-500",
-                  },
-                  { label: "SKU", value: formValues.sku || "—", valueClass: "font-mono text-[11px]" },
-                ].map(({ label, value, valueClass }) => (
+                ].map(({ label, value }) => (
                   <div
                     key={label}
                     className="flex items-center justify-between border-b border-stone-50 px-4 py-2.5 last:border-0 dark:border-zinc-800/50"
                   >
                     <span className="text-xs text-zinc-500">{label}</span>
-                    <span className={cn("text-xs font-semibold text-zinc-800 dark:text-zinc-200", valueClass)}>
+                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                       {value}
                     </span>
                   </div>

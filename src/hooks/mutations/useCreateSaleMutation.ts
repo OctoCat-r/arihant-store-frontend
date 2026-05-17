@@ -12,7 +12,6 @@ export interface CreateSaleInput {
   qty: number
   sellingPrice: number
   customer: string
-  paymentMethod: 'UPI' | 'Cash' | 'Card'
 }
 
 const createSale = async (data: CreateSaleInput): Promise<Sale> => {

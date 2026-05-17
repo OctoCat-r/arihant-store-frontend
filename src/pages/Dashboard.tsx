@@ -4,7 +4,7 @@ import { formatINR } from "@/lib/formatters";
 import {
   KpiCard,
   Icon,
-  RevenueByCategoryChart,
+  SalesChart,
   ProfitRevenueChart,
   TopSellersChart,
   CategoryProfitabilityChart,
@@ -12,7 +12,6 @@ import {
 import { useGetDashboardQuery, useGetCategoriesQuery } from "@/hooks";
 import { useAuthStore } from "@/store";
 import {
-  buildRevenueByCategoryData,
   buildTopSellingProductsData,
   buildCategoryProfitabilityData,
 } from "@/utils/dashboard.utils";
@@ -25,11 +24,6 @@ export function Dashboard() {
   const { data: categories = [] } = useGetCategoriesQuery();
 
   const last14Days = dashboardData?.days ?? [];
-
-  const revenueByCategoryChartData = useMemo(
-    () => buildRevenueByCategoryData(dashboardData, categories),
-    [dashboardData, categories],
-  );
 
   const topSellingProducts = useMemo(
     () => buildTopSellingProductsData(dashboardData, categories),
@@ -85,13 +79,7 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="animate-fade-up delay-3 rounded-2xl border border-stone-200 bg-white p-4 lg:p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Revenue by category
-            </h3>
-            <span className="text-xs text-zinc-400">last 30 days</span>
-          </div>
-          <RevenueByCategoryChart data={revenueByCategoryChartData} />
+          <SalesChart />
         </div>
 
         <div className="animate-fade-up delay-4 rounded-2xl border border-stone-200 bg-white p-4 lg:p-5 dark:border-zinc-800 dark:bg-zinc-900">

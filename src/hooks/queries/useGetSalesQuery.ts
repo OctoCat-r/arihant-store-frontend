@@ -32,9 +32,6 @@ export function useGetSalesQuery(
     ...(filters.catFilter && filters.catFilter !== "all"
       ? { category: filters.catFilter }
       : {}),
-    ...(filters.pmFilter && filters.pmFilter !== "all"
-      ? { payment_method: filters.pmFilter }
-      : {}),
     page_size: "80",
   });
 

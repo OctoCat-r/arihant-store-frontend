@@ -34,7 +34,6 @@ export interface Sale {
   cost: number
   profit: number
   customer: string
-  paymentMethod: 'UPI' | 'Cash' | 'Card'
 }
 
 export type Theme = 'light' | 'dark'
