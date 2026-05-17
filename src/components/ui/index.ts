@@ -1,4 +1,5 @@
 export * from './AppSelect'
+export * from './AsyncProductSelect'
 export * from './Badge'
 export * from './Field'
 export * from './Icon'

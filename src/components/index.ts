@@ -1,4 +1,5 @@
 export * from './charts'
 export * from './inventory'
 export * from './layout'
+export * from './sales'
 export * from './ui'

@@ -6,3 +6,4 @@ export { default as useCreateCategoryMutation } from './useCreateCategoryMutatio
 export { default as useUpdateCategoryMutation } from './useUpdateCategoryMutation'
 export { default as useDeleteCategoryMutation } from './useDeleteCategoryMutation'
 export { default as useAddBrandMutation } from './useAddBrandMutation'
+export { default as useCreateSaleMutation } from './useCreateSaleMutation'
